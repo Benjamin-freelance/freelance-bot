@@ -6,9 +6,10 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 ANTHROPIC_KEY = os.environ.get("ANTHROPIC_KEY")
 
-client = anthropic.Anthropic(api_key=ANTHROPIC_KEY)
-
 user_state = {}
+
+def get_client():
+    return anthropic.Anthropic(api_key=ANTHROPIC_KEY)
 
 def get_state(user_id):
     if user_id not in user_state:
@@ -27,6 +28,7 @@ def detect_type(brief):
         return "article de blog", "800 mots"
 
 def call_claude(prompt):
+    client = get_client()
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=1000,
@@ -53,7 +55,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if state["step"] == "AWAIT_BRIEF":
         state["brief"] = text
         state["step"] = "GENERATING"
-        await update.message.reply_text("⏳ Génération en cours...")
+        await update.message.reply_text("⏳ Génération en cours, patiente 30-60 secondes...")
 
         content_type, word_count = detect_type(text)
         prompt = (
@@ -131,7 +133,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_reply_markup(None)
         await context.bot.send_message(
             chat_id=user_id,
-            text="✏️ Dis-moi ce que tu veux modifier :\n\n_Ex: Rends le ton plus décontracté, ajoute une conclusion plus percutante..._",
+            text="✏️ Dis-moi ce que tu veux modifier :\n\n_Ex: Rends le ton plus décontracté..._",
             parse_mode="Markdown"
         )
 
@@ -175,3 +177,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
