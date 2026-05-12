@@ -11,6 +11,7 @@ ANTHROPIC_KEY = os.environ.get("ANTHROPIC_KEY")
 
 user_state = {}
 
+
 def get_state(user_id):
     if user_id not in user_state:
         user_state[user_id] = {"step": "AWAIT_ACTION", "brief": "", "content": "", "lang": "EN"}
