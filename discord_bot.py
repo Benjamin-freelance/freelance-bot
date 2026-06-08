@@ -988,7 +988,7 @@ async def on_ready():
     print("Commandes slash synchronisées !")
     await log("🚀 AlphaValais Bot démarré ! Stratégie XAU/USD Breakout Session — Full CDC")
     init_db()
-    set_discord_client(client)
+    set_discord_client(client, TRADES_EN_COURS_ID, TRADES_FERMES_ID)
 
     global range_london, range_ny
     saved_london, saved_ny = get_saved_ranges()
